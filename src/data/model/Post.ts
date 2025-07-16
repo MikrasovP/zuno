@@ -185,3 +185,19 @@ Autoconverted link https://github.com/nodeca/pica (enable linkify to see)
         content: `\n# Full Stack Development in 2024\n\nStaying up-to-date as a full stack developer means learning new tools and best practices.\n\n## Popular Frameworks\n- **Frontend:** Next.js, SvelteKit, Astro\n- **Backend:** Node.js, Deno, Bun\n- **Databases:** PostgreSQL, MongoDB, PlanetScale\n\n## Best Practices\n- Use TypeScript everywhere\n- Automate testing and CI/CD\n- Prioritize accessibility and performance\n\n## Example Stack\n\n| Layer      | Technology   |\n| ---------- | ------------|\n| Frontend   | Next.js     |\n| Backend    | Node.js     |\n| Database   | PostgreSQL  |\n\n> "The best stack is the one that fits your team and project."\n`,
     },
 ];
+
+export async function fetchMockPosts() {
+  return new Promise<typeof mockPosts>((resolve) => {
+    setTimeout(() => resolve(mockPosts), 1000);
+  });
+}
+
+export async function fetchMockPostById(id: string) {
+  return new Promise<typeof mockPosts[number]>((resolve, reject) => {
+    setTimeout(() => {
+      const post = mockPosts.find(p => p.id === id);
+      if (post) resolve(post);
+      else reject(new Error('Post not found'));
+    }, 1000);
+  });
+}
