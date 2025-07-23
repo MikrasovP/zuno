@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: zuno
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/zuno
+      JWT_SECRET: zuno_jwt_secret_2025
+      # Add other env vars as needed
+    ports:
+      - "3000:3000"
+    command: sh -c "npx prisma generate && npm run start"
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  db_data: 
