@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useLocation } from 'react-router-dom';
-import { LoadStateProvider } from '@/LoadStateContext';
+import { LoadStateProvider } from '@/context/LoadStateContext';
 
 export default function AppLayout() {
   const location = useLocation();

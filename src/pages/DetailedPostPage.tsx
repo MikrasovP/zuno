@@ -1,11 +1,12 @@
 import PostContent from "@/components/ui/detailed_post/PostContent";
-import { Post, fetchMockPostById, mockPosts } from "@/data/model/Post";
+import { Post } from "@/data/model/Post";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import PostTitle from "@/components/ui/detailed_post/PostTitle";
 import PostSubtitle from "@/components/ui/detailed_post/PostSubtitle";
 import PostImage from "@/components/ui/detailed_post/PostImage";
-import { useLoadState } from "@/LoadStateContext";
+import { useLoadState } from "@/context/LoadStateContext";
+import { fetchPostById } from "@/api/PostApi";
 
 const horizontalPaddingClasses = "px-8 lg:px-24 xl:px-32 2xl:px-48";
 
@@ -17,7 +18,7 @@ export default function DetailedPostPage() {
     useEffect(() => {
         setLoading(true);
         if (id) {
-            fetchMockPostById(id)
+            fetchPostById(id)
                 .then((post) => {
                     setPost(post);
                 })
