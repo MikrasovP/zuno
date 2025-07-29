@@ -1,6 +1,8 @@
-import { getFeed, getPostById } from '../controllers/postController';
+import { PostControllerFactory } from '../factories/postFactory';
+import { Request, Response } from 'express';
 
 export default (app: any) => {
-  app.get('/feed', getFeed);
-  app.get('/post/:id', getPostById);
+  const postController = PostControllerFactory.create();
+  app.get('/feed', (req: Request, res: Response) => postController.getFeed(req, res));
+  app.get('/post/:id', (req: Request, res: Response) => postController.getPostById(req, res));
 }; 

@@ -21,6 +21,7 @@ model posts {
 
 model users {
   id           Int     @id @default(autoincrement())
+  email        String  @unique
   username     String  @unique
   passwordHash String  @map("passwordhash")
   imageSrc     String? @map("imagesrc")

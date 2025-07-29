@@ -1,25 +1,56 @@
 import { Request, Response } from 'express';
-import { register as proceedRegister, login as proceedLogin }
-  from '../services/userService';
+import { IUserService } from '../services/userService';
+import { AuthResponse } from '../models/user';
 
-export const register = async (req: Request, res: Response) => {
-  const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ error: 'Missing fields' });
+export interface IAuthController {
+  register(req: Request, res: Response): Promise<void>;
+  login(req: Request, res: Response): Promise<void>;
+}
 
-  try {
-    const token = await proceedRegister(username, password);
-    res.json({ token });
-  } catch (err) {
-    res.status(400).json({ error: 'User exists' });
-  }
-};
+export class AuthController implements IAuthController {
 
-export const login = async (req: Request, res: Response) => {
-  const { username, password } = req.body;
-  try {
-    const token = await proceedLogin(username, password);
-    res.json({ token });
-  } catch (err: any) {
-    res.status(401).json({ error: err.message || 'Invalid credentials' });
-  }
-}; 
+  constructor(
+    private readonly userService: IUserService
+  ) { }
+
+  async register(req: Request, res: Response) {
+    console.log(req.body);
+    console.log(req.headers);
+    const username = req.body?.username as string;
+    const email = req.body?.email as string;
+    const password = req.body?.password as string;
+    if (!email || !username || !password)
+      res.status(400).json({ error: 'Missing fields' });
+
+    try {
+      const authDto: AuthResponse = await this.userService.register(email, username, password);
+      res.cookie(
+        'token',
+        authDto.token,
+        { httpOnly: true, secure: true, maxAge: 24 * 60 * 60 * 1000 }
+      );
+      res.json(authDto);
+    } catch (err) {
+      console.log(err);
+      res.status(400).json({ error: 'User exists' });
+    }
+  };
+
+  async login(req: Request, res: Response) {
+    console.log(req.body);
+    console.log(req.headers);
+    const email = req.body?.email as string;
+    const password = req.body?.password as string;
+    try {
+      const authDto: AuthResponse = await this.userService.login(email, password);
+      res.cookie(
+        'token',
+        authDto.token,
+        { httpOnly: true, secure: true, maxAge: 24 * 60 * 60 * 1000 }
+      );
+      res.json(authDto);
+    } catch (err: any) {
+      res.status(401).json({ error: err.message || 'Invalid credentials' });
+    }
+  };
+}

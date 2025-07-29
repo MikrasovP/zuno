@@ -2,83 +2,38 @@ import { prisma } from '.';
 
 export interface UserEntity {
   id: number | null;
+  email: string;
   username: string;
   passwordHash: string;
   imageSrc: string | null;
   bio: string | null;
-  createdAt: number;
+  createdAt: bigint;
 }
 
-const demoUsers: UserEntity[] = [
-  {
-    id: 1,
-    username: 'alice_dev',
-    passwordHash: 'password',
-    imageSrc: 'https://via.placeholder.com/150',
-    bio: 'I am a software developer',
-    createdAt: Date.now() - 5,
-  },
-  {
-    id: 2,
-    username: 'bob_dev',
-    passwordHash: 'password',
-    imageSrc: 'https://via.placeholder.com/150',
-    bio: 'I am a software developer',
-    createdAt: Date.now() - 4,
-  },
-  {
-    id: 3,
-    username: 'charlie_dev',
-    passwordHash: 'password',
-    imageSrc: 'https://via.placeholder.com/150',
-    bio: 'I am a software developer',
-    createdAt: Date.now() - 3,
-  },
-  {
-    id: 4,
-    username: 'dave_dev',
-    passwordHash: 'password',
-    imageSrc: 'https://via.placeholder.com/150',
-    bio: 'I am a software developer',
-    createdAt: Date.now() - 2,
-  },
-  {
-    id: 5,
-    username: 'eve_dev',
-    passwordHash: 'password',
-    imageSrc: 'https://via.placeholder.com/150',
-    bio: 'I am a software developer',
-    createdAt: Date.now() - 1,
-  },
-];
+export interface IUserRepository {
+  addUser(user: UserEntity): Promise<void>;
+  findByEmail(email: string): Promise<UserEntity | null>;
+  findByUsername(username: string): Promise<UserEntity | null>;
+}
 
-export class User {
+export class User implements IUserRepository {
 
-
-  static async insertDemoUsers(): Promise<void> {
-    const count = await prisma.users.count()
-    if (count === 0) {
-      await prisma.users.createMany({
-        data: demoUsers.map(user => ({
-          ...user,
-          id: user.id ?? undefined,
-        })),
-      });
-    }
-  }
-
-  static async addUser(user: UserEntity): Promise<void> {
+  async addUser(user: UserEntity): Promise<void> {
+    const { id, ...userData } = user;
     await prisma.users.create({
-      data: {
-        ...user,
-        id: user.id ?? undefined,
-      },
+      data: userData,
     });
   }
 
-  static async findByUsername(username: string): Promise<UserEntity | null> {
+  async findByUsername(username: string): Promise<UserEntity | null> {
     return await prisma.users.findUnique({
       where: { username },
+    }) as UserEntity | null;
+  }
+
+  async findByEmail(email: string): Promise<UserEntity | null> {
+    return await prisma.users.findUnique({
+      where: { email },
     }) as UserEntity | null;
   }
 }

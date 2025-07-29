@@ -1,22 +1,21 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { Post } from './src/db/post';
-import { User } from './src/db/user';
 import authRoutes from './src/routes/auth';
 import postRoutes from './src/routes/post';
 
 const app = express();
+
+// CORS configuration
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:4173'],
   credentials: true,
 }));
-app.use(bodyParser.json());
 
-(async () => {
-  await User.insertDemoUsers();
-  await Post.insertDemoPosts();
-})();
+// Body parser configuration - handle different content types
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+
 
 authRoutes(app);
 postRoutes(app);
