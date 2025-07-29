@@ -1,9 +1,9 @@
 import { Post } from "@/data/model/Post";
 import { PostPreview } from "@/data/model/PostPreview";
 
-let API_BASE_URL = "http://localhost:3000";
 
 export async function fetchPosts(): Promise<PostPreview[]> {
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const res = await fetch(`${API_BASE_URL}/feed`);
     if (!res.ok) {
         throw new Error(`Failed to fetch post: ${res.status} ${res.statusText}`);
@@ -14,6 +14,7 @@ export async function fetchPosts(): Promise<PostPreview[]> {
 }
 
 export async function fetchPostById(id: string): Promise<Post> {
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const res = await fetch(`${API_BASE_URL}/post/${id}`);
     if (!res.ok) {
         throw new Error(`Failed to fetch post: ${res.status} ${res.statusText}`);

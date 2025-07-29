@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useAuthState } from '@/context/AuthStateContext';
+import { useSidePanel } from '@/context/SidePanelContext';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, setUser } = useAuthState();
+  const { openPanel } = useSidePanel();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -45,12 +47,18 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link to="/login" className={buttonClass}>
+                <button
+                  className={buttonClass}
+                  onClick={() => openPanel('login')}
+                >
                   Sign In
-                </Link>
-                <Link to="/signup" className={buttonClass}>
+                </button>
+                <button
+                  className={buttonClass}
+                  onClick={() => openPanel('signup')}
+                >
                   Sign Up
-                </Link>
+                </button>
               </>
             )}
           </div>
@@ -104,20 +112,24 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  <Link
-                    to="/login"
+                  <button
                     className={buttonClass}
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => {
+                      openPanel('login');
+                      setIsMenuOpen(false);
+                    }}
                   >
                     Sign In
-                  </Link>
-                  <Link
-                    to="/signup"
+                  </button>
+                  <button
                     className={buttonClass}
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => {
+                      openPanel('signup');
+                      setIsMenuOpen(false);
+                    }}
                   >
                     Sign Up
-                  </Link>
+                  </button>
                 </>
               )}
             </div>

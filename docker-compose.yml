@@ -12,6 +12,7 @@ services:
       - node_modules_dev:/app/node_modules
     environment:
       - NODE_ENV=development
+      - VITE_API_BASE_URL=http://localhost:3000
     command: npm run dev -- --host
 
   frontend-prod:
@@ -22,6 +23,7 @@ services:
       - "4173:4173"
     environment:
       - NODE_ENV=production
+      - VITE_API_BASE_URL=http://localhost:3000
     command: serve -s dist -l 4173
 
 volumes:
