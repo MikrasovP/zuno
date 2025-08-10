@@ -3,6 +3,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import authRoutes from './src/routes/auth';
 import postRoutes from './src/routes/post';
+import userRoutes from './src/routes/user';
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 authRoutes(app);
 postRoutes(app);
+userRoutes(app);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

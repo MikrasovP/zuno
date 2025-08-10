@@ -7,7 +7,14 @@ export interface UserDto {
   createdAt: number;
 }
 
-export interface AuthResponse {
+export interface AuthDto {
   token: string;
   user: UserDto;
+}
+
+export interface UpdateProfileData {
+  id: number;
+  username?: string;
+  bio?: string;
+  avatarUrl?: string;
 }
