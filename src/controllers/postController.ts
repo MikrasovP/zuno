@@ -5,6 +5,7 @@ import { PostService } from '../services/postService';
 export interface IPostController {
   getFeed(req: Request, res: Response): Promise<void>;
   getPostById(req: Request, res: Response): Promise<void>;
+  getUserPosts(req: Request, res: Response): Promise<void>;
 }
 
 export class PostController implements IPostController {
@@ -35,6 +36,24 @@ export class PostController implements IPostController {
       res.json(post);
     } catch (err) {
       res.status(404).json({ error: 'Not found' });
+    }
+  };
+
+  async getUserPosts(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        res.status(400).json({ error: 'Invalid user ID' });
+        return;
+      }
+      
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      
+      const posts = await this.postService.getPostsByAuthor(userId, page, limit);
+      res.json({ posts, page, limit });
+    } catch (err) {
+      res.status(500).json({ error: 'DB error' });
     }
   };
 }

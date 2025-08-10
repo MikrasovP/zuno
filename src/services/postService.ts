@@ -5,6 +5,7 @@ import { IPostMapper } from "../mappers/postMapper";
 export interface IPostService {
     getPost(id: string): Promise<PostDto | null>;
     getPosts(page: number, limit: number): Promise<PostDto[]>;
+    getPostsByAuthor(authorId: number, page: number, limit: number): Promise<PostDto[]>;
 }
 
 export class PostService implements IPostService {
@@ -21,6 +22,11 @@ export class PostService implements IPostService {
 
     async getPosts(page: number, limit: number): Promise<PostDto[]> {
         const posts = await this.postRepository.getPaginatedWithoutContent(page, limit);
+        return posts.map(post => this.postMapper.toDto(post));
+    }
+
+    async getPostsByAuthor(authorId: number, page: number, limit: number): Promise<PostDto[]> {
+        const posts = await this.postRepository.getByAuthorId(authorId, page, limit);
         return posts.map(post => this.postMapper.toDto(post));
     }
 }

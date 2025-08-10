@@ -26,6 +26,7 @@ export interface PostWithAuthorModel {
 export interface IPostRepository {
     getPaginatedWithoutContent(page: number, limit: number): Promise<PostWithAuthorModel[]>;
     getById(id: string): Promise<PostWithAuthorModel | null>;
+    getByAuthorId(authorId: number, page: number, limit: number): Promise<PostWithAuthorModel[]>;
 }
 
 export class Post implements IPostRepository {
@@ -90,5 +91,37 @@ export class Post implements IPostRepository {
                 imageSrc: res.users.imageSrc ?? '',
             },
         }
+    }
+
+    async getByAuthorId(authorId: number, page = 1, limit = 10): Promise<PostWithAuthorModel[]> {
+        const res = await prisma.posts.findMany({
+            where: { authorId: authorId },
+            skip: (page - 1) * limit,
+            take: limit,
+            orderBy: {
+                publishedTimestamp: 'desc'
+            },
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                publishedTimestamp: true,
+                imageSrc: true,
+                users: {
+                    select: {
+                        username: true,
+                        imageSrc: true,
+                    },
+                },
+            },
+        })
+        return res.map((post: any) => ({
+            ...post,
+            content: '',
+            author: {
+                username: post.users.username,
+                imageSrc: post.users.imageSrc ?? '',
+            },
+        }));
     }
 }
