@@ -8,7 +8,7 @@ import ProfileHeader from "@/components/ui/profile/ProfileHeader";
 import { User } from "@/data/model/User";
 
 export default function ProfilePage() {
-    const { user, authState, onLogin, onLogout } = useAuthState();
+    const { user, authState, onLogin } = useAuthState();
     const [posts, setPosts] = useState<PostPreview[]>([]);
     const { setLoading } = useLoadState();
 

@@ -41,3 +41,27 @@ export async function fetchPostById(id: string): Promise<Post> {
 
     return data as Post;
 }
+
+export interface CreatePostData {
+    title: string;
+    description: string;
+    content: string;
+    imageSrc?: string;
+}
+
+export async function createPost(postData: CreatePostData): Promise<Post> {
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const res = await fetch(`${API_BASE_URL}/posts`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(postData),
+    });
+    if (!res.ok) {
+        throw new Error(`Failed to create post: ${res.status} ${res.statusText}`);
+    }
+    const data = await res.json();
+    return data as Post;
+}
