@@ -3,6 +3,7 @@ import { useAuthState } from "@/context/AuthStateContext";
 import PanelInput from "../PanelInput";
 import SpinnerButtonComponent from "../SpinnerButtonComponent";
 import { signup } from "@/api/AuthApi";
+import { User } from "@/data/model/User";
 
 interface SignupFormProps {
   onSuccess?: () => void;
@@ -15,7 +16,7 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { setUser } = useAuthState();
+  const { onLogin } = useAuthState();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,9 +45,9 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
         return;
       }
       
-      const data = await signup(username, email, password);
-      console.log(data);
-      setUser(data.user);
+      const user: User = await signup(username, email, password);
+      console.log(user);
+      onLogin(user);
       
       onSuccess?.();
     } catch (err) {

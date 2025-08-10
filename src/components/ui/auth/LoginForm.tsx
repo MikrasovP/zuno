@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useAuthState } from "@/context/AuthStateContext";
+import { AuthState, useAuthState } from "@/context/AuthStateContext";
 import PanelInput from "../PanelInput";
 import SpinnerButtonComponent from "../SpinnerButtonComponent";
 import { login } from "@/api/AuthApi";
+import { User } from "@/data/model/User";
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -13,13 +14,13 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { setUser } = useAuthState();
+  const { onLogin } = useAuthState();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-    
+
     try {
       if (!email || !password) {
         setError("Email and password are required.");
@@ -34,10 +35,10 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         return;
       }
 
-      const data = await login(email, password);
-      console.log(data);
-      setUser(data.user);
-      
+      const user: User = await login(email, password);
+      console.log(user);
+      onLogin(user);
+
       onSuccess?.();
     } catch (err) {
       setError("Login failed. Please try again.");

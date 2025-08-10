@@ -1,15 +1,21 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
-import { useAuthState } from '@/context/AuthStateContext';
+import { AuthState, useAuthState } from '@/context/AuthStateContext';
 import { useSidePanel } from '@/context/SidePanelContext';
+import { logout } from '@/api/AuthApi';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, setUser } = useAuthState();
+  const { user, authState, onLogout } = useAuthState();
   const { openPanel } = useSidePanel();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const handleLogout = async () => {
+    await logout();
+    onLogout();
+  }
 
   // Button styles
   const buttonClass =
@@ -33,19 +39,21 @@ export default function Navbar() {
             <Link to="/new" className={menuItemClass}>
               New Post
             </Link>
-            {user ? (
+            {authState === AuthState.AUTHENTICATED && user ? (
               <>
                 <Link to="/me" className={buttonClass}>
                   Me
                 </Link>
                 <button
                   className={buttonClass}
-                  onClick={() => setUser(null)}
+                  onClick={() => {
+                    handleLogout();
+                  }}
                 >
                   Sign Out
                 </button>
               </>
-            ) : (
+            ) : authState === AuthState.UNAUTHENTICATED ? (
               <>
                 <button
                   className={buttonClass}
@@ -60,7 +68,7 @@ export default function Navbar() {
                   Sign Up
                 </button>
               </>
-            )}
+            ) : null}
           </div>
 
           {/* Mobile Menu Button */}
@@ -91,7 +99,7 @@ export default function Navbar() {
               >
                 New Post
               </Link>
-              {user ? (
+              {authState === AuthState.AUTHENTICATED && user ? (
                 <>
                   <Link
                     to="/me"
@@ -103,14 +111,14 @@ export default function Navbar() {
                   <button
                     className={buttonClass}
                     onClick={() => {
-                      setUser(null);
+                      handleLogout();
                       setIsMenuOpen(false);
                     }}
                   >
                     Sign Out
                   </button>
                 </>
-              ) : (
+              ) : authState === AuthState.UNAUTHENTICATED ? (
                 <>
                   <button
                     className={buttonClass}
@@ -131,7 +139,7 @@ export default function Navbar() {
                     Sign Up
                   </button>
                 </>
-              )}
+              ) : null}
             </div>
           </div>
         )}
