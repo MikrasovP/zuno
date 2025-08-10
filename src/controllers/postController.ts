@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
-import { PostServiceFactory } from '../factories/postFactory';
 import { PostService } from '../services/postService';
+import { CreatePostData } from '../models/post';
 
 export interface IPostController {
   getFeed(req: Request, res: Response): Promise<void>;
   getPostById(req: Request, res: Response): Promise<void>;
   getUserPosts(req: Request, res: Response): Promise<void>;
+  createPost(req: Request, res: Response): Promise<void>;
 }
 
 export class PostController implements IPostController {
@@ -54,6 +55,68 @@ export class PostController implements IPostController {
       res.json({ posts, page, limit });
     } catch (err) {
       res.status(500).json({ error: 'DB error' });
+    }
+  };
+
+  async createPost(req: Request, res: Response): Promise<void> {
+    try {
+      let token: string | undefined;
+      const cookieHeader = req.headers.cookie;
+      if (cookieHeader) {
+        const cookies = cookieHeader.split(';').map(c => c.trim());
+        for (const cookie of cookies) {
+          if (cookie.startsWith('token=')) {
+            token = cookie.substring('token='.length);
+            break;
+          }
+        }
+      }
+      if (!token) {
+        res.status(401).json({ error: 'Authorization token missing' });
+        return;
+      }
+
+      const { title, description, content, imageSrc }: CreatePostData = req.body;
+
+      if (!title || !description || !content) {
+        res.status(400).json({ error: 'Title, description, and content are required' });
+        return;
+      }
+
+      if (typeof title !== 'string' || title.trim().length === 0) {
+        res.status(400).json({ error: 'Title must be a non-empty string' });
+        return;
+      }
+
+      if (typeof description !== 'string' || description.trim().length === 0) {
+        res.status(400).json({ error: 'Description must be a non-empty string' });
+        return;
+      }
+
+      if (typeof content !== 'string' || content.trim().length === 0) {
+        res.status(400).json({ error: 'Content must be a non-empty string' });
+        return;
+      }
+
+      if (imageSrc !== undefined && (typeof imageSrc !== 'string' || imageSrc.trim().length === 0)) {
+        res.status(400).json({ error: 'Image URL must be a non-empty string if provided' });
+        return;
+      }
+
+      const postId = await this.postService.createPost(token, {
+        title: title.trim(),
+        description: description.trim(),
+        content: content.trim(),
+        imageSrc: imageSrc?.trim(),
+      });
+
+      res.status(201).json({ id: postId });
+    } catch (err: any) {
+      if (err.message === 'Invalid token' || err.message === 'User not found') {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
+      }
+      res.status(500).json({ error: 'Internal server error' });
     }
   };
 }

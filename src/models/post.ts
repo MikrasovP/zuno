@@ -10,3 +10,10 @@ export interface PostDto {
   imageSrc?: string;
   content: string;
 }
+
+export interface CreatePostData {
+  title: string;
+  description: string;
+  content: string;
+  imageSrc?: string;
+}

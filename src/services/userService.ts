@@ -1,8 +1,8 @@
 import { UserEntity, IUserRepository } from "../db/user";
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { AuthDto, UpdateProfileData, UserDto } from '../models/user';
 import IUserMapper from "../mappers/userMapper";
+import { getUserFromToken, signToken } from '../utils/jwt';
 
 export interface IUserService {
     register(email: string, username: string, password: string): Promise<AuthDto>;
@@ -11,20 +11,11 @@ export interface IUserService {
     validateToken(token: string): Promise<UserDto | null>;
 }
 
-interface JwtPayload {
-    email: string;
-    iat?: number;
-    exp?: number;
-}
-
-const SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
-
 export class UserService implements IUserService {
 
     constructor(
         private readonly userRepository: IUserRepository,
-        private readonly userMapper: IUserMapper,
-        private readonly jwtSecret: string = SECRET
+        private readonly userMapper: IUserMapper
     ) { }
 
     async register(email: string, username: string, password: string): Promise<AuthDto> {
@@ -46,7 +37,7 @@ export class UserService implements IUserService {
             throw new Error('User not found after creation');
         }
 
-        const token = this.signToken(email);
+        const token = signToken(email);
         return { token, user: this.userMapper.toDto(user) };
     }
 
@@ -56,25 +47,21 @@ export class UserService implements IUserService {
         if (!user || !bcrypt.compareSync(password, user.passwordHash)) {
             throw new Error('Invalid email or password');
         }
-        const token = this.signToken(email);
+        const token = signToken(email);
 
         return { token, user: this.userMapper.toDto(user) };
     }
 
     async updateProfile(token: string, data: UpdateProfileData): Promise<AuthDto> {
-        // Validate JWT token
-        const decoded = this.verifyToken(token);
-        if (!decoded || !decoded.email) {
-            throw new Error('Invalid token');
+        const userDto = await getUserFromToken(token, this.userRepository, this.userMapper);
+        
+        if (userDto.id !== data.id) {
+            throw new Error('Unsufficient permissions');
         }
 
-        // Find user by email from token
-        const user = await this.userRepository.findByEmail(decoded.email);
-        if (!user || !user.id ) {
+        const user = await this.userRepository.findByEmail(userDto.email);
+        if (!user || !user.id) {
             throw new Error('User not found');
-        }
-        if (user.id !== data.id) {
-            throw new Error('Unsufficient permissions');
         }
 
         // Validate input data
@@ -103,30 +90,14 @@ export class UserService implements IUserService {
         }
 
         // Generate new token
-        const newToken = this.signToken(updatedUser.email);
+        const newToken = signToken(updatedUser.email);
         return { token: newToken, user: this.userMapper.toDto(updatedUser) };
     }
 
     async validateToken(token: string): Promise<UserDto | null> {
         try {
-            const decoded = this.verifyToken(token);
-            if (!decoded || !decoded.email) return null;
-            const user = await this.userRepository.findByEmail(decoded.email);
-            if (!user) return null;
-            return this.userMapper.toDto(user);
+            return await getUserFromToken(token, this.userRepository, this.userMapper);
         } catch {
-            return null;
-        }
-    }
-
-    private signToken(email: string): string {
-        return jwt.sign({ email }, this.jwtSecret, { expiresIn: '7d' });
-    }
-
-    private verifyToken(token: string): JwtPayload | null {
-        try {
-            return jwt.verify(token, this.jwtSecret) as JwtPayload;
-        } catch (error) {
             return null;
         }
     }

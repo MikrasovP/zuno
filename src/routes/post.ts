@@ -6,4 +6,5 @@ export default (app: any) => {
   app.get('/feed', (req: Request, res: Response) => postController.getFeed(req, res));
   app.get('/post/:id', (req: Request, res: Response) => postController.getPostById(req, res));
   app.get('/user/:id/posts', (req: Request, res: Response) => postController.getUserPosts(req, res));
+  app.post('/posts', (req: Request, res: Response) => postController.createPost(req, res));
 }; 

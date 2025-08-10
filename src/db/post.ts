@@ -23,10 +23,19 @@ export interface PostWithAuthorModel {
     };
 }
 
+export interface CreatePostEntity {
+    title: string;
+    description: string;
+    content: string;
+    imageSrc?: string;
+    authorId: number;
+}
+
 export interface IPostRepository {
     getPaginatedWithoutContent(page: number, limit: number): Promise<PostWithAuthorModel[]>;
     getById(id: string): Promise<PostWithAuthorModel | null>;
     getByAuthorId(authorId: number, page: number, limit: number): Promise<PostWithAuthorModel[]>;
+    createPost(post: CreatePostEntity): Promise<string>;
 }
 
 export class Post implements IPostRepository {
@@ -123,5 +132,24 @@ export class Post implements IPostRepository {
                 imageSrc: post.users.imageSrc ?? '',
             },
         }));
+    }
+
+    async createPost(post: CreatePostEntity): Promise<string> {
+        const result = await prisma.posts.create({
+            data: {
+                id: this.generateId(),
+                title: post.title,
+                description: post.description,
+                content: post.content,
+                imageSrc: post.imageSrc || null,
+                publishedTimestamp: BigInt(Date.now()),
+                authorId: post.authorId,
+            },
+        });
+        return result.id;
+    }
+
+    private generateId(): string {
+        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     }
 }
