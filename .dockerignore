@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 node_modules
 .git
 .gitignore
@@ -5,3 +6,19 @@ dist
 Dockerfile
 .dockerignore
 npm-debug.log 
+=======
+node_modules/
+npm-debug.log
+.env
+.git
+.gitignore
+.DS_Store
+README.md
+tests/
+coverage/
+.vscode/
+.idea/
+*.log
+dist/
+build/
+>>>>>>> backend-merge
