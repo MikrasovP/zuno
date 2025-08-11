@@ -2,16 +2,17 @@ import { PrismaClient } from '../../generated/prisma'
 
 export const prisma = new PrismaClient()
 
-async function main() {
-  // ... you will write your Prisma Client queries here
+async function testConnection() {
+  try {
+    await prisma.$connect()
+    console.log('Database connected successfully')
+  } catch (error) {
+    console.error('Database connection failed:', error)
+  }
 }
 
-main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
-  .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
+testConnection()
+
+process.on('beforeExit', async () => {
+  await prisma.$disconnect()
+})
