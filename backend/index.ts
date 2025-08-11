@@ -10,7 +10,7 @@ const app = express();
 // CORS configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.FRONTEND_URL || 'https://your-frontend-domain.railway.app']
+    ? [process.env.FRONTEND_URL]
     : ['http://localhost:5173', 'http://localhost:4173'],
   credentials: true,
 }));

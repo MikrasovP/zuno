@@ -14,6 +14,10 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
+# Set environment variables for Railway deployment
+ENV NODE_ENV=production
+ENV PORT=3000
+
 # Expose your app port (change if needed)
 EXPOSE 3000
 
