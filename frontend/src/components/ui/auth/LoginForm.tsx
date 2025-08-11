@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AuthState, useAuthState } from "@/context/AuthStateContext";
+import { useAuthState } from "@/context/AuthStateContext";
 import PanelInput from "../PanelInput";
 import SpinnerButtonComponent from "../SpinnerButtonComponent";
 import { login } from "@/api/AuthApi";

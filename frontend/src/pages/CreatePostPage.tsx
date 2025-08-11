@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuthState } from "@/context/AuthStateContext";
 import { createPost, CreatePostData } from "@/api/PostApi";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 import PostEditor from "@/components/ui/post-editor/PostEditor";
 import PostPreview from "@/components/ui/post-editor/PostPreview";
 import ConfirmationDialog from "@/components/ui/ConfirmationDialog";
@@ -32,16 +31,6 @@ export default function CreatePostPage() {
     
     // Check if there are unsaved changes
     const hasUnsavedChanges = title.trim() || description.trim() || content.trim() || imageSrc.trim();
-    
-    // Handle navigation with unsaved changes
-    const handleConfirmNavigation = useCallback(() => {
-        setShowCancelDialog(true);
-    }, []);
-    
-    const { handleNavigation } = useUnsavedChanges({
-        hasUnsavedChanges: !!hasUnsavedChanges,
-        onConfirmNavigation: handleConfirmNavigation,
-    });
     
     // Handle cancel confirmation
     const handleCancelConfirm = useCallback(() => {
@@ -93,16 +82,6 @@ export default function CreatePostPage() {
         }
     };
     
-    // Handle browser back button or other navigation attempts
-    const handleNavigationAttempt = (to: string) => {
-        if (hasUnsavedChanges) {
-            setPendingNavigation(to);
-            setShowCancelDialog(true);
-        } else {
-            navigate(to);
-        }
-    };
-    
     if (!user) {
         return (
             <div className="text-center text-muted-foreground">
@@ -110,11 +89,6 @@ export default function CreatePostPage() {
             </div>
         );
     }
-    
-    const author = {
-        username: user.username,
-        imageSrc: user.avatarUrl || "/defaultAvatar.svg",
-    };
     
     return (
         <div className="min-h-screen bg-background">
@@ -171,7 +145,6 @@ export default function CreatePostPage() {
                                     description={debouncedDescription}
                                     content={debouncedContent}
                                     imageSrc={debouncedImageSrc}
-                                    author={author}
                                 />
                             ) : (
                                 <div className="text-center text-muted-foreground py-12">
