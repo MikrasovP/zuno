@@ -7,11 +7,10 @@ import userRoutes from './src/routes/user';
 
 const app = express();
 
+console.log(process.env.FRONTEND_URL);
 // CORS configuration
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.FRONTEND_URL]
-    : ['http://localhost:5173', 'http://localhost:4173'],
+  origin: [process.env.FRONTEND_URL as string, 'http://localhost:5173'],
   credentials: true,
 }));
 
