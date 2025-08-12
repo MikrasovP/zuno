@@ -37,7 +37,7 @@ export function PostCard({ post }: PostCardProps) {
         <h3 className="text-xl font-semibold mb-2 text-foreground line-clamp-2">
           {post.title}
         </h3>
-        <p className="text-sm text-muted-foreground line-clamp-4 italic">
+        <p className="text-sm text-muted-foreground line-clamp-2 italic">
           {post.description}
         </p>
       </div>
