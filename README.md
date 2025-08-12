@@ -145,6 +145,14 @@ zuno/
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+## 📱 Screenshots
+
+<img width="514" height="993" alt="image" src="https://github.com/user-attachments/assets/44adc9ee-52b2-4a5e-a9a6-cbaf95e31af9" />
+
+<img width="1410" height="983" alt="image" src="https://github.com/user-attachments/assets/80d93737-21c9-4a99-9224-7472676f2160" />
+
+<img width="1384" height="987" alt="image" src="https://github.com/user-attachments/assets/76594cc1-9abc-414c-97e4-5d193b218a42" />
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
